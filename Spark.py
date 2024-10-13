@@ -1,4 +1,3 @@
-import csv
 from pyspark import SparkContext
 
 class ProcessCSV:
@@ -23,11 +22,26 @@ class ProcessCSV:
         results = result_rdd.count()
         return results
     
+    def course_filter(self):
+        #Separating the dataset into each line, and excluding the header.
+        header = self.rdd.first()
+        filtered_rdd = self.rdd.filter(lambda x: x != header).map(lambda x: x.split(","))
+
+        #Filtering for a specific course in each country
+        filtered_course_rdd = filtered_rdd.map(lambda x: (x[0].strip(), x[-2].strip()))
+        grouped_rdd = filtered_course_rdd.groupByKey().mapValues(list)
+        return grouped_rdd.collect()
+
 if __name__=="__main__":
     file_path="data.csv"
     processor = ProcessCSV(file_path)
 
-    #Filter in courses
-    filter = processor.country_filter('USA')
+    #Know the number of observations per country
+    filter = processor.country_filter('GERMANY')
     count = filter.count()
     print(count)
+
+    #Know specific courses in country
+    course = processor.course_filter()
+    for country, courses in course:
+        print(f"COUNTRY: {country}, COURSES: {courses}")
