@@ -27,8 +27,8 @@ class ProcessCSV:
         header = self.rdd.first()
         filtered_rdd = self.rdd.filter(lambda x: x != header).map(lambda x: x.split(","))
 
-        #Filtering for a specific course in each country
-        filtered_course_rdd = filtered_rdd.map(lambda x: (x[0].strip(), x[-2].strip()))
+        #Filtering every specific course in each country
+        filtered_course_rdd = filtered_rdd.map(lambda x: (x[0].strip(), x[-2].strip())) #Used negative indexing because the third element in CSV causes an error.
         grouped_rdd = filtered_course_rdd.groupByKey().mapValues(list)
         return grouped_rdd.collect()
 
@@ -37,11 +37,12 @@ if __name__=="__main__":
     processor = ProcessCSV(file_path)
 
     #Know the number of observations per country
-    filter = processor.country_filter('GERMANY')
+    country_input = input("Type the country: ")
+    filter = processor.country_filter(country_input)
     count = filter.count()
     print(count)
 
-    #Know specific courses in country
+    #Know every course in country
     course = processor.course_filter()
     for country, courses in course:
         print(f"COUNTRY: {country}, COURSES: {courses}")
