@@ -31,6 +31,15 @@ class ProcessCSV:
         filtered_course_rdd = filtered_rdd.map(lambda x: (x[0].strip(), x[-2].strip())) #Used negative indexing because the third element in CSV causes an error.
         grouped_rdd = filtered_course_rdd.groupByKey().mapValues(list)
         return grouped_rdd.collect()
+    
+    def pair_to_course(self):
+        header = self.rdd.first()
+        filtered_rdd = self.rdd.filter(lambda x: x != header).map(lambda x: x.split(","))
+
+        #Filtering every courses
+        separated_rdd = filtered_rdd.filter(lambda x: len(x) >= 4).map(lambda x: (x[0].strip(), x[-1].strip(), x[-2].strip(), x[-3].strip())) #Added a filter because some are entries are lacking.
+        keyed_rdd = separated_rdd.sortByKey()
+        return keyed_rdd.collect()
 
 if __name__=="__main__":
     file_path="data.csv"
@@ -46,3 +55,8 @@ if __name__=="__main__":
     course = processor.course_filter()
     for country, courses in course:
         print(f"COUNTRY: {country}, COURSES: {courses}")
+
+    #Generating Key Pairs
+    key_pair = processor.pair_to_course()
+    for record in key_pair:
+        print(f"Country: {record[0]}, Course: {record[3]}, Specialization: {record[2]}, Amount: {record[1]}")
