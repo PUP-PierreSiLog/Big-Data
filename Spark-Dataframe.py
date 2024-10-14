@@ -40,6 +40,12 @@ class ProcessCSV:
         separated_rdd = filtered_rdd.filter(lambda x: len(x) >= 4).map(lambda x: (x[0].strip(), x[-1].strip(), x[-2].strip(), x[-3].strip())) #Added a filter because some are entries are lacking.
         keyed_rdd = separated_rdd.sortByKey()
         return keyed_rdd.collect()
+    
+    def stop_spark(self):
+    #Method to stop the Spark session
+        if self.sc is not None:
+            self.sc.stop()
+            print("Spark session stopped.")
 
 if __name__=="__main__":
     file_path="data.csv"
@@ -60,3 +66,5 @@ if __name__=="__main__":
     key_pair = processor.pair_to_course()
     for record in key_pair:
         print(f"Country: {record[0]}, Course: {record[3]}, Specialization: {record[2]}, Amount: {record[1]}")
+
+    processor.stop_spark()
