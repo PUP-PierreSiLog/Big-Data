@@ -4,7 +4,6 @@ spark = SparkSession.builder \
     .appName("CSV Reader") \
     .getOrCreate()
 
-
 df= spark.read.csv("data.csv", header=True, inferSchema=True)
 
 #Grouping by Course type
