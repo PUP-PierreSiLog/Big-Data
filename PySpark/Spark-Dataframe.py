@@ -4,7 +4,7 @@ spark = SparkSession.builder \
     .appName("CSV Reader") \
     .getOrCreate()
 
-df= spark.read.csv("data.csv", header=True, inferSchema=True)
+df= spark.read.csv("Big Data/PySpark/data.csv", header=True)
 
 #Grouping by Course type
 df_csv_by_type = df.groupby('COURSE TYPE')
